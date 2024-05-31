@@ -1,5 +1,7 @@
 const express = require('express')
 const usersRouter = express.Router()
+const jwt = require('jsonwebtoken')
+const bcrypt = import('bcrypt')
 
 const User = require('../models/user')
 
@@ -28,8 +30,9 @@ usersRouter.get('/:id', async (request, response, next) => {
 
 usersRouter.post('/', async (request, response, next) => {
   const { name, password } = request.body
+  const passwordHash = await bcrypt.hash(password, 10)
   try {
-    const userObject = new User({ name, password })
+    const userObject = new User({ name, password: passwordHash })
     const savedUser = await userObject.save()
     response.status(201).send(savedUser)
   } catch (error) {
